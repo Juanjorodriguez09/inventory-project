@@ -14,17 +14,15 @@ jobs:
       CI: true
 
     steps:
-      # CHECKOUT
       - name: Checkout del repositorio
         uses: actions/checkout@v4
 
-      # NODE VERSION
       - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "20"
 
-      # BACKEND
+      # ---------- BACKEND ----------
       - name: Instalar dependencias backend
         working-directory: inventory-api
         run: npm install
@@ -35,37 +33,30 @@ jobs:
 
       - name: Tests backend (unitarias + integración)
         working-directory: inventory-api
-        env:
-          NODE_ENV: test
         run: npm test
 
-      # FRONTEND
+      # ---------- FRONTEND ----------
       - name: Instalar dependencias frontend
         working-directory: inventory-frontend
-        run: |
-          npm install
-          npm install --save-dev wait-on
+        run: npm install
 
       - name: Lint frontend
         working-directory: inventory-frontend
         run: npm run lint
 
-      # PLAYWRIGHT (E2E)
       - name: Instalar navegadores de Playwright
         working-directory: inventory-frontend
         run: npx playwright install --with-deps
 
-      # BACKEND 
+      # ---------- INICIAR BACKEND ----------
       - name: Iniciar backend
         working-directory: inventory-api
         run: |
           npm start &
-          echo " Backend iniciado"
-          npx wait-on http://localhost:3000
-          echo "Backend OK ✔"
+      - name: Esperar a backend
+        run: npx wait-on http://localhost:3000/categories
 
-      # FRONTEND → build + preview
-      
+      # ---------- PARA FRONTEND: BUILD + PREVIEW ----------
       - name: Build frontend
         working-directory: inventory-frontend
         run: npm run build
@@ -74,16 +65,13 @@ jobs:
         working-directory: inventory-frontend
         run: |
           npm run preview -- --host 0.0.0.0 --port 5173 &
-          echo " Frontend iniciando..."
-          npx wait-on http://localhost:5173
-          echo "Frontend OK ✔"
+      - name: Esperar a frontend
+        run: npx wait-on http://localhost:5173
 
-      
-      # E2E
+      # ---------- E2E ----------
       - name: Ejecutar tests E2E
         working-directory: inventory-frontend
         run: npm run test:e2e
 
-      # FINAL
       - name: Imprimir OK si todo pasó
-        run: echo "OK ✔ Todos los checks pasaron correctamente."
+        run: echo "OK Todos los pasos de CI pasaron correctamente."
