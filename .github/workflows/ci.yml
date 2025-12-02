@@ -9,21 +9,22 @@ on:
 jobs:
   ci:
     runs-on: ubuntu-latest
-
     env:
       CI: true
 
     steps:
+      # Checkout
       - name: Checkout del repositorio
         uses: actions/checkout@v4
 
+      # Node
       - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "20"
-        
 
-      # ---------- BACKEND ----------
+
+      # BACKEND
       - name: Instalar dependencias backend
         working-directory: inventory-api
         run: npm install
@@ -36,7 +37,9 @@ jobs:
         working-directory: inventory-api
         run: npm test
 
-      # ---------- FRONTEND ----------
+
+      # FRONTEND
+      
       - name: Instalar dependencias frontend
         working-directory: inventory-frontend
         run: npm install
@@ -45,27 +48,44 @@ jobs:
         working-directory: inventory-frontend
         run: npm run lint
 
-      # ---------- E2E CON PLAYWRIGHT ----------
+
+      # PREPARAR PLAYWRIGHT
       - name: Instalar navegadores de Playwright
         working-directory: inventory-frontend
         run: npx playwright install --with-deps
 
+
+      # LEVANTAR BACKEND 
+      
       - name: Iniciar backend
         working-directory: inventory-api
         run: |
           npm start &
-          sleep 10
+          npx wait-on http://localhost:3000
 
-      - name: Iniciar frontend
+
+      # LEVANTAR FRONTEND (BUILD + PREVIEW)
+      
+      - name: Build frontend
+        working-directory: inventory-frontend
+        run: npm run build
+
+      - name: Iniciar servidor preview
         working-directory: inventory-frontend
         run: |
-          npm run dev -- --host 0.0.0.0 --port 5173 &
-          sleep 20
+          npm run preview -- --host 0.0.0.0 --port 5173 &
+          npx wait-on http://localhost:5173
 
+
+      # E2E TESTS
+      
       - name: Ejecutar tests E2E
         working-directory: inventory-frontend
+        env:
+          BASE_URL: http://localhost:5173
         run: npm run test:e2e
 
-      # ---------- OK FINAL ----------
+
+      # OK final
       - name: Imprimir OK si todo pasó
         run: echo "OK"
