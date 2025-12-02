@@ -48,7 +48,7 @@ jobs:
         working-directory: inventory-frontend
         run: npx playwright install --with-deps
 
-      # ---------- INICIAR BACKEND ----------
+      # ---------- BACKEND PARA E2E ----------
       - name: Iniciar backend
         working-directory: inventory-api
         run: |
@@ -56,9 +56,11 @@ jobs:
       - name: Esperar a backend
         run: npx wait-on http://localhost:3000/categories
 
-      # ---------- PARA FRONTEND: BUILD + PREVIEW ----------
+      # ---------- FRONTEND: BUILD + PREVIEW ----------
       - name: Build frontend
         working-directory: inventory-frontend
+        env:
+          ROLLUP_SKIP_NODEJS_NATIVE: "true"
         run: npm run build
 
       - name: Iniciar servidor preview frontend
@@ -74,4 +76,7 @@ jobs:
         run: npm run test:e2e
 
       - name: Imprimir OK si todo pasó
-        run: echo "OK Todos los pasos de CI pasaron correctamente."
+        run: echo "OK"
+
+
+        
