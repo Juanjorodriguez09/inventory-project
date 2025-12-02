@@ -40,3 +40,9 @@
 .read-the-docs {
   color: #888;
 }
+.table-description {
+  max-width: 180px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

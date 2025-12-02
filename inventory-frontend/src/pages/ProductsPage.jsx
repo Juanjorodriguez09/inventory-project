@@ -328,46 +328,50 @@ export default function ProductsPage() {
         ) : (
           <div className="table-wrapper">
             <table className="table">
-              <thead>
-                <tr>
-                  <th>Producto</th>
-                  <th>Categoría</th>
-                  <th>Precio</th>
-                  <th>Stock</th>
-                  <th style={{ width: 170 }}>Acciones</th>
-                </tr>
-              </thead>
-              <tbody>
-                {products.map((p) => (
-                  <tr key={p.id}>
-                    <td>{p.name}</td>
-                    <td>{p.category?.name || "-"}</td>
-                    <td>{formatPrice(p.price)}</td>
-                    <td>{p.stock}</td>
-                    <td>
-                      <div className="table-actions">
-                        <button
-                          className="button button-sm"
-                          style={{ background: "#4b5563" }}
-                          type="button"
-                          onClick={() => handleEdit(p)}
-                        >
-                          Editar
-                        </button>
-                        <button
-                          className="button button-sm"
-                          style={{ background: "#ef4444" }}
-                          type="button"
-                          onClick={() => handleDelete(p.id)}
-                        >
-                          Eliminar
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+  <thead>
+    <tr>
+      <th>Producto</th>
+      <th>Descripción</th>
+      <th>Categoría</th>
+      <th>Precio</th>
+      <th>Stock</th>
+      <th style={{ width: 170 }}>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    {products.map((p) => (
+      <tr key={p.id}>
+        <td>{p.name}</td>
+        <td className="table-description">
+          {p.description || "-"}
+        </td>
+        <td>{p.category?.name || "-"}</td>
+        <td>{formatPrice(p.price)}</td>
+        <td>{p.stock}</td>
+        <td>
+          <div className="table-actions">
+            <button
+              className="button button-sm"
+              style={{ background: "#4b5563" }}
+              type="button"
+              onClick={() => handleEdit(p)}
+            >
+              Editar
+            </button>
+            <button
+              className="button button-sm"
+              style={{ background: "#ef4444" }}
+              type="button"
+              onClick={() => handleDelete(p.id)}
+            >
+              Eliminar
+            </button>
+          </div>
+        </td>
+      </tr>
+    ))}
+  </tbody>
+</table>
           </div>
         )}
       </section>
