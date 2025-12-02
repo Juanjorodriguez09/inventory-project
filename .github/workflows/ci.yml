@@ -1,0 +1,51 @@
+name: CI Inventory Project
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # ---------------- BACKEND ----------------
+      - name: Install backend dependencies
+        working-directory: ./inventory-api
+        run: npm ci
+
+      - name: Run backend tests
+        working-directory: ./inventory-api
+        run: npm test
+
+      - name: Run backend lint
+        working-directory: ./inventory-api
+        run: npm run lint
+
+      # ---------------- FRONTEND ----------------
+      - name: Install frontend dependencies
+        working-directory: ./inventory-frontend
+        run: npm ci
+
+      - name: Install Playwright browsers
+        working-directory: ./inventory-frontend
+        run: npx playwright install --with-deps
+
+      - name: Run E2E tests (Playwright)
+        working-directory: ./inventory-frontend
+        run: npm run test:e2e
+
+      # ---------------- OK FINAL -----------------
+      - name: All good
+        if: success()
+        run: echo "OK"
