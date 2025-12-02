@@ -10,9 +10,9 @@ function App() {
       <div className="app-shell">
         <header className="app-header">
           <div>
-            <h1 className="app-title">Inventory Manager</h1>
+            <h1 className="app-title">Manejo de Inventario</h1>
             <p className="app-subtitle">
-              Administra categorías y productos desde una interfaz sencilla.
+              Administra categorías y productos.
             </p>
           </div>
           <span className="badge">Proyecto Pruebas de Software</span>
