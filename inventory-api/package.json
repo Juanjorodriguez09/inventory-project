@@ -6,8 +6,12 @@
   "scripts": {
     "dev": "node src/index.js",
     "start": "node src/index.js",
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand"
 
+    "lint": "eslint src --ext .js",
+
+    "test": "npm run test:unit && npm run test:integration",
+    "test:unit": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand tests/unit",
+    "test:integration": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand tests/integration"
   },
   "keywords": [],
   "author": "",

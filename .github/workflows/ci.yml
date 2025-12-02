@@ -1,4 +1,4 @@
-name: CI Inventory Project
+name: CI
 
 on:
   push:
@@ -10,42 +10,62 @@ jobs:
   ci:
     runs-on: ubuntu-latest
 
+    env:
+      CI: true
+
     steps:
-      - name: Checkout repo
+      - name: Checkout del repositorio
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: "20"
+          cache: "npm"
 
-      # ---------------- BACKEND ----------------
-      - name: Install backend dependencies
-        working-directory: ./inventory-api
-        run: npm ci
+      # ---------- BACKEND ----------
+      - name: Instalar dependencias backend
+        working-directory: inventory-api
+        run: npm install
 
-      - name: Run backend tests
-        working-directory: ./inventory-api
-        run: npm test
-
-      - name: Run backend lint
-        working-directory: ./inventory-api
+      - name: Lint backend
+        working-directory: inventory-api
         run: npm run lint
 
-      # ---------------- FRONTEND ----------------
-      - name: Install frontend dependencies
-        working-directory: ./inventory-frontend
-        run: npm ci
+      - name: Tests backend (unitarias + integración)
+        working-directory: inventory-api
+        run: npm test
 
-      - name: Install Playwright browsers
-        working-directory: ./inventory-frontend
+      # ---------- FRONTEND ----------
+      - name: Instalar dependencias frontend
+        working-directory: inventory-frontend
+        run: npm install
+
+      - name: Lint frontend
+        working-directory: inventory-frontend
+        run: npm run lint
+
+      # ---------- E2E CON PLAYWRIGHT ----------
+      - name: Instalar navegadores de Playwright
+        working-directory: inventory-frontend
         run: npx playwright install --with-deps
 
-      - name: Run E2E tests (Playwright)
-        working-directory: ./inventory-frontend
+      - name: Iniciar backend
+        working-directory: inventory-api
+        run: |
+          npm start &
+          sleep 10
+
+      - name: Iniciar frontend
+        working-directory: inventory-frontend
+        run: |
+          npm run dev -- --host 0.0.0.0 --port 5173 &
+          sleep 20
+
+      - name: Ejecutar tests E2E
+        working-directory: inventory-frontend
         run: npm run test:e2e
 
-      # ---------------- OK FINAL -----------------
-      - name: All good
-        if: success()
+      # ---------- OK FINAL ----------
+      - name: Imprimir OK si todo pasó
         run: echo "OK"

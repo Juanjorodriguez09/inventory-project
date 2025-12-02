@@ -73,7 +73,6 @@ export default function CategoriesPage() {
       });
       loadCategories();
     } catch (err) {
-      // 409 = conflicto (categoría usada por productos)
       if (err.response?.status === 409) {
         setFeedback({
           type: "error",

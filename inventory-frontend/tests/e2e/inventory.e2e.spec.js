@@ -31,7 +31,6 @@ test("flujo completo: crear categoría, crear producto y verlo en el listado", a
 
   await page.getByLabel("Categoría").selectOption({ label: categoryName });
 
-  // 8. Crear producto
   await page.getByRole("button", { name: "+ Crear producto" }).click();
 
   await expect(page.getByText(productName)).toBeVisible();
