@@ -9,20 +9,20 @@ on:
 jobs:
   ci:
     runs-on: ubuntu-latest
+
     env:
       CI: true
 
     steps:
-      # Checkout
+      # CHECKOUT
       - name: Checkout del repositorio
         uses: actions/checkout@v4
 
-      # Node
+      # NODE VERSION
       - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "20"
-
 
       # BACKEND
       - name: Instalar dependencias backend
@@ -35,57 +35,55 @@ jobs:
 
       - name: Tests backend (unitarias + integración)
         working-directory: inventory-api
+        env:
+          NODE_ENV: test
         run: npm test
 
-
       # FRONTEND
-      
       - name: Instalar dependencias frontend
         working-directory: inventory-frontend
-        run: npm install
+        run: |
+          npm install
+          npm install --save-dev wait-on
 
       - name: Lint frontend
         working-directory: inventory-frontend
         run: npm run lint
 
-
-      # PREPARAR PLAYWRIGHT
+      # PLAYWRIGHT (E2E)
       - name: Instalar navegadores de Playwright
         working-directory: inventory-frontend
         run: npx playwright install --with-deps
 
-
-      # LEVANTAR BACKEND 
-      
+      # BACKEND 
       - name: Iniciar backend
         working-directory: inventory-api
         run: |
           npm start &
+          echo " Backend iniciado"
           npx wait-on http://localhost:3000
+          echo "Backend OK ✔"
 
-
-      # LEVANTAR FRONTEND (BUILD + PREVIEW)
+      # FRONTEND → build + preview
       
       - name: Build frontend
         working-directory: inventory-frontend
         run: npm run build
 
-      - name: Iniciar servidor preview
+      - name: Iniciar servidor preview frontend
         working-directory: inventory-frontend
         run: |
           npm run preview -- --host 0.0.0.0 --port 5173 &
+          echo " Frontend iniciando..."
           npx wait-on http://localhost:5173
+          echo "Frontend OK ✔"
 
-
-      # E2E TESTS
       
+      # E2E
       - name: Ejecutar tests E2E
         working-directory: inventory-frontend
-        env:
-          BASE_URL: http://localhost:5173
         run: npm run test:e2e
 
-
-      # OK final
+      # FINAL
       - name: Imprimir OK si todo pasó
-        run: echo "OK"
+        run: echo "OK ✔ Todos los checks pasaron correctamente."
