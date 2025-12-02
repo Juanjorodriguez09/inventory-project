@@ -53,20 +53,22 @@ jobs:
         working-directory: inventory-api
         run: |
           npm start &
+          echo "Backend iniciado"
       - name: Esperar a backend
         run: npx wait-on http://localhost:3000/categories
 
       # ---------- FRONTEND: BUILD + PREVIEW ----------
       - name: Build frontend
         working-directory: inventory-frontend
-        env:
-          ROLLUP_SKIP_NODEJS_NATIVE: "true"
-        run: npm run build
+        run: |
+          export ROLLUP_SKIP_NODEJS_NATIVE=true
+          npm run build
 
       - name: Iniciar servidor preview frontend
         working-directory: inventory-frontend
         run: |
           npm run preview -- --host 0.0.0.0 --port 5173 &
+          echo "Frontend preview iniciado"
       - name: Esperar a frontend
         run: npx wait-on http://localhost:5173
 
@@ -77,6 +79,3 @@ jobs:
 
       - name: Imprimir OK si todo pasó
         run: echo "OK"
-
-
-        
